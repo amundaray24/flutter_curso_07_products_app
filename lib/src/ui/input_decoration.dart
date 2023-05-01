@@ -5,13 +5,13 @@ class InputDecorations {
   static InputDecoration loginInputDecoration({
     required String hint,
     required String label,
-    required IconData icon,
-    required Color color
+    required Color color,
+    IconData? icon,
   }) {
     return InputDecoration(
         enabledBorder: UnderlineInputBorder(
             borderSide: BorderSide(
-                color: color
+              color: color
             )
         ),
         focusedBorder: UnderlineInputBorder(
@@ -25,10 +25,10 @@ class InputDecorations {
         labelStyle: const TextStyle(
             color: Colors.grey
         ),
-        prefixIcon: Icon(
+        prefixIcon: icon!=null ? Icon(
           icon,
           color: color,
-        )
+        ) : null
     );
   }
 
