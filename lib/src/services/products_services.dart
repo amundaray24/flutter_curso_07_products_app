@@ -1,22 +1,18 @@
-import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-
 import 'package:flutter_curso_07_products_app/src/models/product.dart';
+import 'package:flutter_curso_07_products_app/src/services/base_service.dart';
 
 
-class ProductsServices extends ChangeNotifier {
+class ProductsServices extends BaseService {
 
   final String _baseUrl = 'monkey-solutions-es-firebase-default-rtdb.europe-west1.firebasedatabase.app';
   final String _bucketName = 'monkey-solutions-es-firebase-flutter-course';
-  final String _bucketBaseUrl = 'storage.googleapis.com';
   final List<Product> products = [];
   late Product selectedProduct;
-  late File? selectedPicture;
+  File? selectedPicture;
   bool isLoading = true;
 
-  ProductsServices() {
+  ProductsServices() : super() {
     getProducts();
   }
 
@@ -24,7 +20,8 @@ class ProductsServices extends ChangeNotifier {
     isLoading = true;
     notifyListeners();
 
-    final response = await _getJsonData('products.json');
+    final response = await super.getJsonData(_baseUrl, 'products.json');
+
     response.forEach((key, value) {
        final product = Product.fromMap(value);
        product.id = key;
@@ -41,7 +38,7 @@ class ProductsServices extends ChangeNotifier {
     isLoading = true;
     notifyListeners();
 
-    final response = await _postJsonData('products.json',product.toJson());
+    final response = await super.postJsonData(_baseUrl, 'products.json',product.toJson());
 
     product.id = response['name'];
     products.add(product);
@@ -55,7 +52,7 @@ class ProductsServices extends ChangeNotifier {
     isLoading = true;
     notifyListeners();
 
-    await _putJsonData('/products/${product.id}.json',product.toJson());
+    await super.putJsonData(_baseUrl, '/products/${product.id}.json',product.toJson());
     products[products.indexWhere((element) => product.id==element.id)] = product;
 
     isLoading = false;
@@ -73,52 +70,11 @@ class ProductsServices extends ChangeNotifier {
     isLoading = true;
     notifyListeners();
 
-    final response = await _postBinaryFile('/upload/storage/v1/b/$_bucketName/o');
+    final response = await super.postBinaryFile(_baseUrl, '/upload/storage/v1/b/$_bucketName/o', selectedPicture!);
 
     isLoading = false;
     notifyListeners();
 
     return 'https://storage.googleapis.com/$_bucketName/${response['name']}';
-  }
-
-  Future<Map<String,dynamic>> _getJsonData( String endpoint, ) async {
-
-    final url = Uri.https( _baseUrl, endpoint);
-    final response = await http.get(url);
-
-    return json.decode(response.body);
-  }
-
-  Future<Map<String,dynamic>> _postJsonData( String endpoint, String body ) async {
-
-    final url = Uri.https( _baseUrl, endpoint);
-    final response = await http.post(url,body: body);
-
-    return json.decode(response.body);
-  }
-
-  Future<Map<String,dynamic>> _putJsonData( String endpoint, String body ) async {
-
-    final url = Uri.https( _baseUrl, endpoint);
-    final response = await http.put(url,body: body);
-
-    return json.decode(response.body);
-  }
-
-  Future<Map<String,dynamic>> _postBinaryFile( String endpoint) async {
-
-    final Map<String, String> params = {
-      'uploadType': 'media',
-      'name': selectedPicture!.path.split('/').last,
-    };
-
-    final url = Uri.https( _bucketBaseUrl, endpoint, params);
-
-    final response = await http.post(
-      url,
-      body: await selectedPicture!.readAsBytes()
-    );
-
-    return json.decode(response.body);
   }
 }

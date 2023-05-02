@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_curso_07_products_app/src/services/authentication_service.dart';
+import 'package:flutter_curso_07_products_app/src/services/notifications_service.dart';
 import 'package:provider/provider.dart';
 
 import 'package:flutter_curso_07_products_app/src/screens/screens.dart';
@@ -17,6 +19,9 @@ class AppState extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(
           create: (_) => ProductsServices(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => AuthenticationService()
         )
       ],
       child: const MyApp(),
@@ -44,11 +49,14 @@ class MyApp extends StatelessWidget {
         ),
         scaffoldBackgroundColor: Colors.grey[300]
       ),
-      initialRoute: 'home',
+      scaffoldMessengerKey: NotificationsService.messengerKey,
+      initialRoute: 'authenticationLogin',
       routes: {
-        'login'   : (_) => const LoginScreen(),
-        'home'    : (_) => const HomeScreen(),
-        'product' : (_) => const ProductScreen()
+        'singUp'              : (_) => const SingUpScreen(),
+        'login'               : (_) => const LoginScreen(),
+        'home'                : (_) => const HomeScreen(),
+        'product'             : (_) => const ProductScreen(),
+        'authenticationLogin' : (_) => const AuthenticationLoadingScreen(),
       },
     );
   }

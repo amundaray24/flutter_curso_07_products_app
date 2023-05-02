@@ -6,9 +6,9 @@ import 'package:provider/provider.dart';
 import 'package:flutter_curso_07_products_app/src/ui/input_decoration.dart';
 import 'package:flutter_curso_07_products_app/src/widgets/widgets.dart';
 
-class LoginScreen extends StatelessWidget {
+class SingUpScreen extends StatelessWidget {
 
-  const LoginScreen({Key? key}) : super(key: key);
+  const SingUpScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,7 @@ class LoginScreen extends StatelessWidget {
                   children: [
                     const SizedBox(height: 10,),
                     Text(
-                      'Login',
+                      'Create Account',
                       style: Theme.of(context).textTheme.headlineMedium
                     ),
                     const SizedBox(height: 30,),
@@ -41,8 +41,8 @@ class LoginScreen extends StatelessWidget {
                   overlayColor: MaterialStatePropertyAll(Colors.blue),
                   shape: MaterialStatePropertyAll(StadiumBorder()),
                 ),
-                onPressed: () => Navigator.pushReplacementNamed(context, 'singUp'),
-                child: const Text('Sing Up', style: TextStyle(fontSize: 18),),
+                onPressed: () => Navigator.pushReplacementNamed(context, 'login'),
+                child: const Text('Do you have an Account?', style: TextStyle(fontSize: 18),),
               ),
             ],
           ),
@@ -77,7 +77,8 @@ class _LoginForm extends StatelessWidget {
               color: Colors.blue
             ),
             onChanged: (value) => loginFormProvider.email = value,
-            validator: (value) => RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value ?? '') ? null : 'Invalid email address',
+            validator: (value) => RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                .hasMatch(value ?? '') ? null : 'Invalid email address',
           ),
 
           const SizedBox(height: 30,),
@@ -93,7 +94,8 @@ class _LoginForm extends StatelessWidget {
                 color: Colors.blue
             ),
             onChanged: (value) => loginFormProvider.password = value,
-            validator: (value) => RegExp(r"^[a-zA-Z0-9#$%&*]{6}").hasMatch(value ?? '') ? null : 'Invalid password, min length 6 chars',
+            validator: (value) => RegExp(r"^[a-zA-Z0-9#$%&*]{6}")
+                .hasMatch(value ?? '') ? null : 'Invalid password, min length 6 chars',
           ),
 
           const SizedBox(height: 30,),
@@ -112,7 +114,7 @@ class _LoginForm extends StatelessWidget {
 
               loginFormProvider.isLoading = true;
 
-              final String? errorMessage = await authService.authenticateUser(loginFormProvider.email, loginFormProvider.password);
+              final String? errorMessage = await authService.createUser(loginFormProvider.email, loginFormProvider.password);
 
               if (errorMessage == null) {
                 Navigator.pushReplacementNamed(context, 'home');
@@ -120,12 +122,11 @@ class _LoginForm extends StatelessWidget {
                 NotificationsService.showSnackBar(errorMessage);
                 loginFormProvider.isLoading = false;
               }
-
             } : null,
             child: Text(
               loginFormProvider.isLoading ?
               'Loading...' :
-              'Sign In',
+              'Sign Up',
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
